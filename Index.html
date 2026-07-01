@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CYBER_DASH // v2.026</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.json">
+</head>
+<body>
+  <div class="scanlines"></div>
+  <div class="matrix-grid">
+    
+    <section class="cyber-panel">
+      <div class="panel-header">SYSTEM_TIME</div>
+      <div id="clock" class="neon-text-cyan">00:00:00</div>
+      <div id="date" class="glitch-text">01.07.2026</div>
+    </section>
+
+    <section class="cyber-panel">
+      <div class="panel-header">SHIFT_DRAIN_RATIO</div>
+      <div class="progress-container">
+        <div id="progress-bar" class="progress-fill"></div>
+        <div id="progress-text">0.0%</div>
+      </div>
+    </section>
+
+    <section class="cyber-panel">
+      <div class="panel-header">ENV_METRICS</div>
+      <div id="weather">QUERYING SATELLITE...</div>
+    </section>
+
+    <section class="cyber-panel long-panel">
+      <div class="panel-header">EXTRACTION_VECTOR // BUS_DEPARTURES</div>
+      <div id="bus-board" class="terminal-list">
+        <div>LOADING TRANSIT STREAMS...</div>
+      </div>
+    </section>
+
+  </div>
+  <script href="app.js"></script>
+</body>
+</html>
