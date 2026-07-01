@@ -181,11 +181,12 @@
       }
     }
 
-    // TRANSIT EXTRACTION ENGINE
+    // TRANSIT EXTRACTION ENGINE (REFACTORED PROXY)
     async function fetchTransit() {
       try {
         const targetUrl = `https://transportapi.com/v3/uk/bus/stop/${BUS_STOP_ID}/live.json?app_id=741002cf&app_key=2c9a92025eb270a43063548325a7a922&group=no&nextbuses=no`;
-        const response = await fetch(`https://corsproxy.io/?url=${encodeURIComponent(targetUrl)}`);
+        
+        const response = await fetch(`https://api.codetabs.com/v1/proxy?url=${encodeURIComponent(targetUrl)}`);
         if (!response.ok) throw new Error(`HTTP_${response.status}`);
         
         const data = await response.json();
@@ -220,7 +221,7 @@
         }
         document.getElementById('bus-board').innerHTML = htmlOutput;
       } catch (error) {
-        document.getElementById('bus-board').innerHTML = `<span style="color: #ff0055;">TRANSIT_FAULT // NETWORK_REJECT</span>`;
+        document.getElementById('bus-board').innerHTML = `<span style="color: #ff0055;">TRANSIT_FAULT // ${error.message.toUpperCase()}</span>`;
       }
     }
 
