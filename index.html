@@ -5,16 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CYBER_DASH // v2.026</title>
   <link rel="stylesheet" href="style.css">
-  <link rel="manifest" href="manifest.json">
 </head>
 <body>
   <div class="scanlines"></div>
   <div class="matrix-grid">
     
     <section class="cyber-panel">
-      <div class="panel-header">SYSTEM_TIME</div>
-      <div id="clock" class="neon-text-cyan">00:00:00</div>
-      <div id="date" class="glitch-text">01.07.2026</div>
+      <div class="panel-header">SYSTEM_TIME // COUNTDOWN_UNTIL_EXIT</div>
+      <div style="display: flex; justify-content: space-between; align-items: baseline;">
+        <div id="clock" class="neon-text-cyan" style="font-size: 3rem; text-shadow: 0 0 10px #00ffcc;">00:00:00</div>
+        <div id="time-left" style="font-size: 1.5rem; color: #ff0055; text-shadow: 0 0 8px #ff0055; font-weight: bold;">T-MINUS: --:--:--</div>
+      </div>
+      <div id="date" class="glitch-text" style="color: rgba(0, 255, 204, 0.6); margin-top: 5px;">01.07.2026</div>
     </section>
 
     <section class="cyber-panel">
@@ -27,13 +29,13 @@
 
     <section class="cyber-panel">
       <div class="panel-header">ENV_METRICS</div>
-      <div id="weather">QUERYING SATELLITE...</div>
+      <div id="weather">MATRIX ACTIVE...</div>
     </section>
 
     <section class="cyber-panel long-panel">
-      <div class="panel-header">EXTRACTION_VECTOR // BUS_DEPARTURES</div>
+      <div class="panel-header">EXTRACTION_VECTOR // BUS_DEPARTURES (MORRIS WAY)</div>
       <div id="bus-board" class="terminal-list">
-        <div>LOADING TRANSIT STREAMS...</div>
+        <div>INITIALIZING DATA FEEDS...</div>
       </div>
     </section>
 
