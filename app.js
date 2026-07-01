@@ -2,8 +2,9 @@
 // CONFIGURATION & CORES
 // ==========================================
 const WEATHER_API_KEY = "22ade28a2863255c534c5f05f96691f0";
-const LAT = 52.4633; // Localized coordinates
-const LON = -1.7311;
+const LAT = 52.4555; 
+const LON = -1.7289;
+const BUS_STOP_ID = "43000170202"; // NEC, after Morris Way (Northbound)
 
 // ==========================================
 // MODULE 01 & 02: TIME & WORKDAY RATIO
@@ -11,10 +12,10 @@ const LON = -1.7311;
 function updateChronometer() {
   const now = new Date();
   
-  // Format terminal clock text
+  // Terminal Clock
   document.getElementById('clock').innerText = now.toTimeString().split(' ')[0];
   
-  // Calculate Shift Progress Ratio (07:30 - 16:00)
+  // Shift Progress Ratio (07:30 - 16:00)
   const start = new Date();
   start.setHours(7, 30, 0, 0);
   
@@ -62,28 +63,65 @@ async function fetchWeather() {
 }
 
 // ==========================================
-// MODULE 04: EXTRACTION VECTOR (TRANSIT)
+// MODULE 04: EXTRACTION VECTOR (LIVE BUSES)
 // ==========================================
 async function fetchTransit() {
-  // Placeholder network array until your transit key is active
-  // This ensures the visual grid stays rendering correctly
-  document.getElementById('bus-board').innerHTML = `
-    <div style="color: rgba(0, 255, 204, 0.4); font-size: 0.9rem; font-style: italic;">
-      AWAITING API VECTOR AUTHENTICATION Token...
-    </div>
-  `;
+  try {
+    // Open TransportAPI stream setup
+    const response = await fetch(`https://transportapi.com/v3/uk/bus/stop/${BUS_STOP_ID}/live.json?app_id=03bf8009&app_key=d7574317130c2d3c2fa53cc9bb4e731d&group=no&nextbuses=no`);
+    if (!response.ok) throw new Error("TRANSIT_ERR");
+    
+    const data = await response.json();
+    const allBuses = data.departures.all || [];
+    
+    let htmlOutput = "";
+    
+    if (allBuses.length === 0) {
+      htmlOutput = `<div style="color: rgba(0, 255, 204, 0.4); font-size: 0.9rem;">NO ACTIVE EXTRACTION VECTORS SCHEDULED</div>`;
+    } else {
+      // Pull top 3 closest arrivals
+      allBuses.slice(0, 3).forEach(bus => {
+        const line = bus.line;
+        const dest = bus.direction.toUpperCase();
+        
+        let statusText = "";
+        if (bus.best_departure_estimate) {
+          const [hours, minutes] = bus.best_departure_estimate.split(':').map(Number);
+          const now = new Date();
+          const target = new Date();
+          target.setHours(hours, minutes, 0, 0);
+          
+          let diffMins = Math.round((target - now) / 60000);
+          if (diffMins <= 0) statusText = "DUE";
+          else statusText = `${diffMins} MIN`;
+        } else {
+          statusText = bus.aimed_departure_time || "SCHED";
+        }
+        
+        htmlOutput += `
+          <div style="display: flex; justify-content: space-between; font-size: 1.1rem; margin-bottom: 8px; border-bottom: 1px dashed rgba(0, 255, 204, 0.15); padding-bottom: 4px;">
+            <span style="color: #ff0055; font-weight: bold; min-width: 70px;">[${line}]</span>
+            <span style="color: #00ffcc; flex-grow: 1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; margin-right: 10px;">${dest}</span>
+            <span style="color: #fff; text-shadow: 0 0 5px #fff; font-weight: bold;">${statusText}</span>
+          </div>
+        `;
+      });
+    }
+    
+    document.getElementById('bus-board').innerHTML = htmlOutput;
+  } catch (error) {
+    document.getElementById('bus-board').innerHTML = `<span style="color: #ff0055;">TRANSIT_STREAM_DISRUPTED // LINK_LOSS</span>`;
+  }
 }
 
 // ==========================================
 // INITIALIZATION MATRIX
 // ==========================================
-// Live core updates
 setInterval(updateChronometer, 1000);
 updateChronometer();
 
-// Periodic API fetch frequencies
-setInterval(fetchWeather, 900000); // 15 Minute cycle
+setInterval(fetchWeather, 900000); 
 fetchWeather();
 
-setInterval(fetchTransit, 120000); // 2 Minute cycle
+setInterval(fetchTransit, 60000); 
 fetchTransit();
