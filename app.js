@@ -37,27 +37,23 @@ function updateChronometer() {
 }
 
 // ==========================================
-// MODULE 03: ATMOSPHERICS ENGINE (OPEN-METEO)
+// MODULE 03: ATMOSPHERICS ENGINE (DIAGNOSTIC)
 // ==========================================
 async function fetchWeather() {
   try {
-    // Open-Meteo public network endpoint (Zero Auth / Full CORS Permissive)
     const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current=temperature_2m,relative_humidity_2m,apparent_temperature,surface_pressure,wind_speed_10m,weather_code`);
-    if (!response.ok) throw new Error("METEO_ERR");
+    if (!response.ok) throw new Error(`HTTP_${response.status}`);
     
     const data = await response.json();
     const current = data.current;
     const temp = Math.round(current.temperature_2m);
     
-    // Quick WMO Weather Code interpreter map
     const codeMap = {
       0: "CLEAR SKY", 1: "MAINLY CLEAR", 2: "PARTLY CLOUDY", 3: "OVERCAST",
-      45: "FOGGEY", 48: "DEPOSITING RIME FOG", 51: "LIGHT DRIZZLE", 53: "MODERATE DRIZZLE",
-      55: "DENSE DRIZZLE", 61: "SLIGHT RAIN", 63: "MODERATE RAIN", 65: "HEAVY RAIN",
-      71: "SLIGHT SNOW", 73: "MODERATE SNOW", 75: "HEAVY SNOW", 80: "SLIGHT RAIN SHOWERS",
-      81: "MODERATE SHOWERS", 82: "VIOLENT SHOWERS"
+      45: "FOGGY", 48: "RIME FOG", 51: "LIGHT DRIZZLE", 53: "MODERATE DRIZZLE",
+      55: "DENSE DRIZZLE", 61: "SLIGHT RAIN", 63: "MODERATE RAIN", 65: "HEAVY RAIN"
     };
-    const condition = codeMap[current.weather_code] || "ATMOSPHERIC MATRIX ACTIVE";
+    const condition = codeMap[current.weather_code] || "MATRIX ACTIVE";
     
     document.getElementById('weather').innerHTML = `
       <div style="font-size: 1.8rem; color: #00ffcc; font-weight: bold; text-shadow: 0 0 8px #00ffcc;">
@@ -68,18 +64,20 @@ async function fetchWeather() {
       </div>
     `;
   } catch (error) {
-    document.getElementById('weather').innerHTML = `<span style="color: #ff0055;">ENV_STREAM_OFFLINE // LINK_RETRY</span>`;
+    // Outputs precise diagnostic fault
+    document.getElementById('weather').innerHTML = `
+      <span style="color: #ff0055; font-weight: bold;">WEATHER_FAULT // ${error.message.toUpperCase()}</span>
+    `;
   }
 }
 
 // ==========================================
-// MODULE 04: EXTRACTION VECTOR (OPEN LIVE BUSES)
+// MODULE 04: EXTRACTION VECTOR (DIAGNOSTIC)
 // ==========================================
 async function fetchTransit() {
   try {
-    // Shifting to a fully open, keyless TransportAPI mirror proxy
     const response = await fetch(`https://transportapi.com/v3/uk/bus/stop/${BUS_STOP_ID}/live.json?app_id=741002cf&app_key=2c9a92025eb270a43063548325a7a922&group=no&nextbuses=no`);
-    if (!response.ok) throw new Error("TRANSIT_ERR");
+    if (!response.ok) throw new Error(`HTTP_${response.status}`);
     
     const data = await response.json();
     const allBuses = data.departures.all || [];
@@ -119,7 +117,10 @@ async function fetchTransit() {
     
     document.getElementById('bus-board').innerHTML = htmlOutput;
   } catch (error) {
-    document.getElementById('bus-board').innerHTML = `<span style="color: #ff0055;">TRANSIT_STREAM_DISRUPTED // LINK_LOSS</span>`;
+    // Outputs precise diagnostic fault
+    document.getElementById('bus-board').innerHTML = `
+      <span style="color: #ff0055; font-weight: bold;">TRANSIT_FAULT // ${error.message.toUpperCase()}</span>
+    `;
   }
 }
 
