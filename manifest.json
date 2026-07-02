@@ -3,13 +3,18 @@
   "short_name": "CyberDash",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#0d0e15",
+  "background_color": "#0b0c10",
   "theme_color": "#00ffcc",
   "orientation": "portrait",
   "icons": [
     {
-      "src": "https://via.placeholder.com/192/00ffcc/000000?text=SYS",
+      "src": "https://via.placeholder.com/192/0b0c10/00ffcc?text=SYS",
       "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://via.placeholder.com/512/0b0c10/00ffcc?text=SYS",
+      "sizes": "512x512",
       "type": "image/png"
     }
   ]
