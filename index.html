@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CYBER_DASH // SYSTEM_ACTIVE</title>
+  <title>CYBER_DASH // v2.077_PHANTOM</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
 
@@ -14,7 +14,7 @@
     }
 
     body {
-      background-color: #0d0e15;
+      background-color: #0b0c10;
       color: #00ffcc;
       font-family: 'Share Tech Mono', monospace;
       overflow: hidden;
@@ -44,33 +44,49 @@
 
     .cyber-panel {
       border: 1px solid #00ffcc;
-      background: rgba(13, 14, 21, 0.85);
-      box-shadow: 0 0 10px rgba(0, 255, 204, 0.2), inset 0 0 10px rgba(0, 255, 204, 0.1);
+      background: rgba(11, 12, 16, 0.85);
+      box-shadow: 0 0 12px rgba(0, 255, 204, 0.15), inset 0 0 10px rgba(0, 255, 204, 0.1);
       padding: 15px;
       position: relative;
     }
 
+    .cyber-panel::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; width: 10px; height: 10px;
+      border-top: 2px solid #ff0055;
+      border-left: 2px solid #ff0055;
+    }
+
     .panel-header {
-      font-size: 0.8rem;
+      font-size: 0.85rem;
       letter-spacing: 2px;
       color: #ff0055;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
       border-bottom: 1px solid #ff0055;
-      padding-bottom: 3px;
+      padding-bottom: 4px;
+      text-transform: uppercase;
     }
 
     .progress-container {
       border: 1px solid #ff0055;
-      height: 30px;
+      height: 32px;
       position: relative;
       background: rgba(255, 0, 85, 0.05);
+      overflow: hidden;
     }
 
     .progress-fill {
-      background: #ff0055;
+      background: repeating-linear-gradient(
+        45deg,
+        #ff0055,
+        #ff0055 10px,
+        #cc0044 10px,
+        #cc0044 20px
+      );
       height: 100%;
       width: 0%;
-      box-shadow: 0 0 8px #ff0055;
+      box-shadow: 0 0 10px #ff0055;
       transition: width 0.5s ease;
     }
 
@@ -80,15 +96,20 @@
       transform: translate(-50%, -50%);
       color: #fff;
       font-weight: bold;
+      text-shadow: 1px 1px 2px #000;
     }
 
-    .transit-item {
-      display: flex; 
-      justify-content: space-between; 
-      font-size: 1.1rem; 
-      margin-bottom: 8px; 
-      border-bottom: 1px dashed rgba(0, 255, 204, 0.15); 
-      padding-bottom: 4px;
+    /* Glitch effect class for Easter Eggs */
+    .glitch {
+      animation: glitch-skew 1s infinite linear alternate-reverse;
+    }
+    @keyframes glitch-skew {
+      0% { transform: skew(0deg); }
+      20% { transform: skew(-2deg); }
+      40% { transform: skew(2deg); }
+      60% { transform: skew(-1deg); }
+      80% { transform: skew(1deg); }
+      100% { transform: skew(0deg); }
     }
   </style>
 </head>
@@ -97,15 +118,15 @@
   
   <div class="matrix-grid">
     <section class="cyber-panel">
-      <div class="panel-header">SYSTEM_TIME // COUNTDOWN_UNTIL_EXIT</div>
+      <div class="panel-header">SYSTEM_TIME // CORPO_PRISON_COUNTDOWN</div>
       <div style="display: flex; justify-content: space-between; align-items: baseline;">
-        <div id="clock" style="font-size: 3rem; text-shadow: 0 0 10px #00ffcc; color: #00ffcc;">00:00</div>
+        <div id="clock" style="font-size: 3.5rem; text-shadow: 0 0 12px #00ffcc; color: #00ffcc;">00:00</div>
         <div id="time-left" style="font-size: 1.5rem; color: #ff0055; text-shadow: 0 0 8px #ff0055; font-weight: bold;">T-MINUS: --:--</div>
       </div>
     </section>
 
     <section class="cyber-panel">
-      <div class="panel-header">SHIFT_DRAIN_RATIO</div>
+      <div class="panel-header">SHIFT_DRAIN_RATIO // SOULKILLER_STATUS</div>
       <div class="progress-container">
         <div id="progress-bar" class="progress-fill"></div>
         <div id="progress-text">0.0%</div>
@@ -113,26 +134,29 @@
     </section>
 
     <section class="cyber-panel">
-      <div class="panel-header">ENV_METRICS (LOCAL)</div>
+      <div class="panel-header">ENV_METRICS (OUTSIDE THE WALLS)</div>
       <div id="weather">CONNECTING TO SENSORS...</div>
     </section>
 
     <section class="cyber-panel">
-      <div class="panel-header">EXTRACTION_VECTOR // DEPARTURES</div>
-      <div id="bus-board">
-        <div style="color: rgba(0,255,204,0.6);">INITIALIZING DATA FEEDS...</div>
+      <div class="panel-header">DECRYPTED_COMMS // CORRUPTED_STREAM</div>
+      <div id="madlib-board" style="padding-top: 5px;">
+        <div style="color: rgba(0,255,204,0.6);">DECRYPTING BLACKWALL PACKETS...</div>
       </div>
     </section>
   </div>
 
   <script>
+    // Console Easter Egg
+    console.log("%c WAKE UP, SAMURAI. WE HAVE A FRESHDESK TICKET TO BURN.", "color: #ff0055; font-size: 16px; font-weight: bold; font-family: monospace;");
+    console.warn("WARNING: Unauthorized access to Arasaka subnet detected. Deploying ICE...");
+
     // ==========================================
     // SYSTEM CONFIGURATION
     // ==========================================
     const CONFIG = {
       lat: 52.4555,
       lon: -1.7289,
-      busStopId: "43000170202",
       shiftStartHour: 7,
       shiftStartMin: 30,
       shiftEndHour: 16,
@@ -145,10 +169,8 @@
     function updateChronometer() {
       const now = new Date();
       
-      // Update Main Clock
       document.getElementById('clock').innerText = now.toTimeString().split(' ')[0];
       
-      // Calculate Shift Boundaries
       const start = new Date();
       start.setHours(CONFIG.shiftStartHour, CONFIG.shiftStartMin, 0, 0);
       
@@ -160,7 +182,7 @@
       
       if (now > end) {
         percentage = 100;
-        countdownText = "SYS_CLEAR // 00:00:00";
+        countdownText = "SYS_CLEAR // ESCAPE_SUCCESS";
       } else if (now >= start) {
         const totalDuration = end - start;
         const elapsed = now - start;
@@ -175,7 +197,6 @@
         countdownText = "AWAITING_SHIFT_START";
       }
       
-      // Update UI
       document.getElementById('time-left').innerText = countdownText;
       const cleanPct = percentage.toFixed(2);
       document.getElementById('progress-bar').style.width = `${cleanPct}%`;
@@ -195,84 +216,90 @@
         const temp = Math.round(data.current.temperature_2m);
         
         const codeMap = {
-          0: "CLEAR SKY", 1: "MAINLY CLEAR", 2: "PARTLY CLOUDY", 3: "OVERCAST",
-          45: "FOGGY", 51: "LIGHT DRIZZLE", 61: "SLIGHT RAIN", 63: "MODERATE RAIN"
+          0: "RAD-STORM CLEARED", 1: "MAINLY CLEAR", 2: "PARTLY CLOUDY", 3: "OVERCAST (WATCH FOR DROP PODS)",
+          45: "SILENT HILL FOG", 51: "ACID DRIZZLE", 61: "SLIGHT RAIN", 63: "HEAVY RAIN"
         };
         const condition = codeMap[data.current.weather_code] || "MATRIX ACTIVE";
         
         document.getElementById('weather').innerHTML = `
           <div style="font-size: 1.8rem; color: #00ffcc; font-weight: bold; text-shadow: 0 0 8px #00ffcc;">${temp}°C // ${condition}</div>
-          <div style="font-size: 0.8rem; color: rgba(0, 255, 204, 0.6); margin-top: 4px;">HUMIDITY: ${data.current.relative_humidity_2m}%</div>
+          <div style="font-size: 0.8rem; color: rgba(0, 255, 204, 0.6); margin-top: 4px;">RELATIVE HUMIDITY: ${data.current.relative_humidity_2m}%</div>
         `;
       } catch (error) {
-        document.getElementById('weather').innerHTML = `<span style="color: #ff0055;">WEATHER_FAULT</span>`;
+        document.getElementById('weather').innerHTML = `<span style="color: #ff0055;" class="glitch">WEATHER_SENSORS_COMPROMISED</span>`;
       }
     }
 
     // ==========================================
-    // MODULE: TRANSIT EXTRACTION (TRANSPORTAPI)
+    // MODULE: DATA INTERCEPT (EASTER EGG MADLIBS)
     // ==========================================
-    async function fetchTransit() {
-      const APP_ID = "6724b89c"; 
-      const APP_KEY = "5c7fa551b200f4a830f5ae85";
+    function generateCorruptedLog() {
+      const subjects = [
+        "A rogue Dogtown netrunner",
+        "The Umbrella Corp IT department",
+        "A feral ghoul",
+        "Mr. X",
+        "A malfunctioning Ender 3 direct drive",
+        "The local sysadmin",
+        "A Splicer from Rapture",
+        "An unpatched Azure AD tenant",
+        "A highly aggressive Deathclaw",
+        "The Tojo Clan chairman"
+      ];
+
+      const verbs = [
+        "spilled Mango Loco over",
+        "closed a Freshdesk ticket by burning",
+        "attempted to overwrite the Relic with",
+        "critically overclocked",
+        "injected a plasmid into",
+        "blamed a DNS outage on",
+        "bypassed the Watchguard firewall using",
+        "accidentally 3D printed",
+        "spilled a fresh pot of Nuln Oil on",
+        "ran a rogue SnipeIT script against"
+      ];
+
+      const objects = [
+        "a spilled can of sugar-free Mountain Dew.",
+        "the company's primary domain controller.",
+        "the Spencer Mansion blueprints.",
+        "a glowing bottle of Nuka-Cola Quantum.",
+        "the Blackwall.",
+        "a user who unplugged their own monitor.",
+        "a heavily modified PrusaSlicer config.",
+        "the Master Sword.",
+        "a pristine PLA diorama.",
+        "the Print Spooler service."
+      ];
+
+      const s = subjects[Math.floor(Math.random() * subjects.length)];
+      const v = verbs[Math.floor(Math.random() * verbs.length)];
+      const o = objects[Math.floor(Math.random() * objects.length)];
+
+      const sentence = `${s} ${v} ${o}`;
       
-      try {
-        const url = `https://transportapi.com/v3/uk/bus/stop/${CONFIG.busStopId}/live.json?app_id=${APP_ID}&app_key=${APP_KEY}&group=no&nextbuses=no`;
-        
-        const response = await fetch(url);
-        if (!response.ok) throw new Error(`HTTP_${response.status}`);
-        
-        const data = await response.json();
-        const allBuses = data.departures.all || [];
-        let htmlOutput = "";
-        
-        if (allBuses.length === 0) {
-          htmlOutput = `<div style="color: rgba(0, 255, 204, 0.4);">NO VECTORS SCHEDULED</div>`;
-        } else {
-          // Process the next 4 buses
-          allBuses.slice(0, 4).forEach(bus => {
-            const line = bus.line;
-            const dest = bus.direction.toUpperCase();
-            let statusText = bus.aimed_departure_time || "SCHED";
-            
-            if (bus.best_departure_estimate) {
-              const [hours, minutes] = bus.best_departure_estimate.split(':').map(Number);
-              const now = new Date();
-              const target = new Date();
-              target.setHours(hours, minutes, 0, 0);
-              let diffMins = Math.round((target - now) / 60000);
-              statusText = diffMins <= 0 ? "DUE" : `${diffMins} MIN`;
-            }
-            
-            htmlOutput += `
-              <div class="transit-item">
-                <span style="color: #ff0055; font-weight: bold; min-width: 50px;">[${line}]</span>
-                <span style="color: #00ffcc; flex-grow: 1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; margin-right: 10px;">${dest}</span>
-                <span style="color: #fff; text-shadow: 0 0 5px #fff; font-weight: bold;">${statusText}</span>
-              </div>
-            `;
-          });
-        }
-        document.getElementById('bus-board').innerHTML = htmlOutput;
-      } catch (error) {
-        document.getElementById('bus-board').innerHTML = `<span style="color: #ff0055;">TRANSIT_FAULT // ${error.message}</span>`;
-      }
+      const hexId = Math.floor(Math.random()*16777215).toString(16).toUpperCase().padStart(6, '0');
+
+      document.getElementById('madlib-board').innerHTML = `
+        <div style="font-size: 0.8rem; color: #ff0055; margin-bottom: 8px;">> INTERCEPT_ID: 0x${hexId}</div>
+        <div style="font-size: 1.15rem; color: #00ffcc; line-height: 1.5; text-shadow: 0 0 5px rgba(0,255,204,0.3);">
+          > "${sentence}"
+        </div>
+      `;
     }
 
     // ==========================================
     // INITIALIZATION
     // ==========================================
-    // Run clock every second
     setInterval(updateChronometer, 1000);
     updateChronometer();
 
-    // Run weather every 15 minutes
     setInterval(fetchWeather, 900000); 
     fetchWeather();
 
-    // Run transit every 60 seconds
-    setInterval(fetchTransit, 60000); 
-    fetchTransit();
+    generateCorruptedLog();
+    setInterval(generateCorruptedLog, 12000); // Decrypts a new packet every 12 seconds
   </script>
 </body>
 </html>
