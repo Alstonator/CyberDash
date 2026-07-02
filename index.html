@@ -2,6 +2,383 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>CYBER_DASH // v2.077_PHANTOM</title>
+  
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0b0c10">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%230b0c10%22 rx=%2220%22/><text x=%2250%22 y=%2265%22 font-family=%22monospace%22 font-size=%2250%22 fill=%22%2300ffcc%22 text-anchor=%22middle%22 font-weight=%22bold%22>%3E_</text></svg>">
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: #0b0c10;
+      color: #00ffcc;
+      font-family: 'Share Tech Mono', monospace;
+      overflow: hidden;
+      height: 100vh;
+      padding: 15px;
+    }
+
+    /* CRT Scanline Overlay */
+    .scanlines {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+                  linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+      background-size: 100% 4px, 6px 100%;
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 10px;
+      position: relative;
+      z-index: 20;
+    }
+
+    .config-btn {
+      background: transparent;
+      border: 1px solid #ff0055;
+      color: #ff0055;
+      font-family: 'Share Tech Mono', monospace;
+      padding: 5px 10px;
+      cursor: pointer;
+      font-weight: bold;
+      letter-spacing: 1px;
+      transition: background 0.2s;
+    }
+    
+    .config-btn:hover { background: rgba(255, 0, 85, 0.2); }
+
+    .matrix-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      grid-gap: 15px;
+      height: calc(100% - 40px);
+      z-index: 1;
+      position: relative;
+    }
+
+    .cyber-panel {
+      border: 1px solid #00ffcc;
+      background: rgba(11, 12, 16, 0.85);
+      box-shadow: 0 0 12px rgba(0, 255, 204, 0.15), inset 0 0 10px rgba(0, 255, 204, 0.1);
+      padding: 15px;
+      position: relative;
+    }
+
+    .cyber-panel::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; width: 10px; height: 10px;
+      border-top: 2px solid #ff0055;
+      border-left: 2px solid #ff0055;
+    }
+
+    .panel-header {
+      font-size: 0.85rem;
+      letter-spacing: 2px;
+      color: #ff0055;
+      margin-bottom: 12px;
+      border-bottom: 1px solid #ff0055;
+      padding-bottom: 4px;
+      text-transform: uppercase;
+    }
+
+    .progress-container {
+      border: 1px solid #ff0055;
+      height: 32px;
+      position: relative;
+      background: rgba(255, 0, 85, 0.05);
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      background: repeating-linear-gradient(45deg, #ff0055, #ff0055 10px, #cc0044 10px, #cc0044 20px);
+      height: 100%;
+      width: 0%;
+      box-shadow: 0 0 10px #ff0055;
+      transition: width 0.5s ease;
+    }
+
+    #progress-text {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      color: #fff;
+      font-weight: bold;
+      text-shadow: 1px 1px 2px #000;
+    }
+
+    .glitch { animation: glitch-skew 1s infinite linear alternate-reverse; }
+    @keyframes glitch-skew {
+      0% { transform: skew(0deg); }
+      20% { transform: skew(-2deg); }
+      40% { transform: skew(2deg); }
+      60% { transform: skew(-1deg); }
+      80% { transform: skew(1deg); }
+      100% { transform: skew(0deg); }
+    }
+
+    /* Modal Overlay styling */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.85);
+      z-index: 50;
+      justify-content: center;
+      align-items: center;
+      backdrop-filter: blur(3px);
+    }
+
+    .modal-content {
+      background: #0b0c10;
+      border: 1px solid #00ffcc;
+      box-shadow: 0 0 25px rgba(0, 255, 204, 0.3);
+      padding: 20px;
+      width: 90%;
+      max-width: 400px;
+      position: relative;
+    }
+
+    .modal-content label { display: block; margin-top: 15px; color: #00ffcc; font-size: 0.9rem; }
+    .modal-content input {
+      width: 100%; padding: 10px; margin-top: 5px;
+      background: rgba(0, 255, 204, 0.05); border: 1px solid #ff0055; color: #fff;
+      font-family: 'Share Tech Mono', monospace; font-size: 1.1rem;
+    }
+    .modal-content input:focus { outline: none; box-shadow: 0 0 8px rgba(255, 0, 85, 0.5); }
+    
+    .modal-buttons { margin-top: 25px; display: flex; justify-content: flex-end; gap: 15px; }
+  </style>
+</head>
+<body>
+  <div class="scanlines"></div>
+
+  <div class="top-bar">
+    <button class="config-btn" id="btn-open-config">[SYS_CONFIG]</button>
+  </div>
+  
+  <div class="matrix-grid">
+    <section class="cyber-panel">
+      <div class="panel-header">SYSTEM_TIME // CORPO_PRISON_COUNTDOWN</div>
+      <div style="display: flex; justify-content: space-between; align-items: baseline;">
+        <div id="clock" style="font-size: 3.5rem; text-shadow: 0 0 12px #00ffcc; color: #00ffcc;">00:00</div>
+        <div id="time-left" style="font-size: 1.5rem; color: #ff0055; text-shadow: 0 0 8px #ff0055; font-weight: bold;">T-MINUS: --:--</div>
+      </div>
+    </section>
+
+    <section class="cyber-panel">
+      <div class="panel-header">SHIFT_DRAIN_RATIO // SOULKILLER_STATUS</div>
+      <div class="progress-container">
+        <div id="progress-bar" class="progress-fill"></div>
+        <div id="progress-text">0.0%</div>
+      </div>
+    </section>
+
+    <section class="cyber-panel">
+      <div class="panel-header">ENV_METRICS (OUTSIDE THE WALLS)</div>
+      <div id="weather">CONNECTING TO SENSORS...</div>
+    </section>
+
+    <section class="cyber-panel">
+      <div class="panel-header">DECRYPTED_COMMS // CORRUPTED_STREAM</div>
+      <div id="madlib-board" style="padding-top: 5px;">
+        <div style="color: rgba(0,255,204,0.6);">DECRYPTING BLACKWALL PACKETS...</div>
+      </div>
+    </section>
+  </div>
+
+  <div class="modal-overlay" id="settingsModal">
+    <div class="modal-content">
+      <div class="panel-header" style="font-size: 1.2rem;">OVERRIDE SHIFT PARAMETERS</div>
+      
+      <label for="shiftStart">SHIFT START (HH:MM)</label>
+      <input type="time" id="shiftStart" required>
+      
+      <label for="shiftEnd">SHIFT END (HH:MM)</label>
+      <input type="time" id="shiftEnd" required>
+      
+      <div class="modal-buttons">
+        <button class="config-btn" id="btn-cancel-config" style="border-color: #555; color: #aaa;">CANCEL</button>
+        <button class="config-btn" id="btn-save-config">COMMIT DATA</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    console.log("%c WAKE UP, SAMURAI. WE HAVE A FRESHDESK TICKET TO BURN.", "color: #ff0055; font-size: 16px; font-weight: bold; font-family: monospace;");
+
+    const CyberDash = {
+      config: {
+        lat: 52.4555,
+        lon: -1.7289,
+        shiftStart: "07:30",
+        shiftEnd: "16:00"
+      },
+      
+      dictionary: {
+        subjects: ["A rogue process", "The sysadmin", "A feral ghoul"],
+        verbs: ["corrupted", "spilled Mango Loco over", "bypassed"],
+        objects: ["the mainframe.", "a user's ticket.", "the Master Sword."]
+      },
+
+      init() {
+        this.loadConfig();
+        this.bindEvents();
+        
+        // Boot sequences
+        this.updateChronometer();
+        setInterval(() => this.updateChronometer(), 1000);
+        
+        this.fetchWeather();
+        setInterval(() => this.fetchWeather(), 900000); // 15 mins
+        
+        this.loadDictionary().then(() => {
+          this.generateCorruptedLog();
+          setInterval(() => this.generateCorruptedLog(), 12000); 
+        });
+      },
+
+      loadConfig() {
+        const saved = localStorage.getItem('cyberDashConfig');
+        if (saved) {
+          this.config = { ...this.config, ...JSON.parse(saved) };
+        }
+      },
+
+      saveConfig() {
+        this.config.shiftStart = document.getElementById('shiftStart').value || "07:30";
+        this.config.shiftEnd = document.getElementById('shiftEnd').value || "16:00";
+        localStorage.setItem('cyberDashConfig', JSON.stringify(this.config));
+        this.toggleModal(false);
+        this.updateChronometer();
+      },
+
+      bindEvents() {
+        document.getElementById('btn-open-config').addEventListener('click', () => this.toggleModal(true));
+        document.getElementById('btn-cancel-config').addEventListener('click', () => this.toggleModal(false));
+        document.getElementById('btn-save-config').addEventListener('click', () => this.saveConfig());
+      },
+
+      toggleModal(show) {
+        const modal = document.getElementById('settingsModal');
+        if (show) {
+          document.getElementById('shiftStart').value = this.config.shiftStart;
+          document.getElementById('shiftEnd').value = this.config.shiftEnd;
+          modal.style.display = 'flex';
+        } else {
+          modal.style.display = 'none';
+        }
+      },
+
+      updateChronometer() {
+        const now = new Date();
+        document.getElementById('clock').innerText = now.toTimeString().split(' ')[0];
+        
+        const start = new Date();
+        const [startH, startM] = this.config.shiftStart.split(':');
+        start.setHours(parseInt(startH), parseInt(startM), 0, 0);
+        
+        const end = new Date();
+        const [endH, endM] = this.config.shiftEnd.split(':');
+        end.setHours(parseInt(endH), parseInt(endM), 0, 0);
+        
+        let percentage = 0;
+        let countdownText = "";
+        
+        if (now > end) {
+          percentage = 100;
+          countdownText = "SYS_CLEAR // ESCAPE_SUCCESS";
+        } else if (now >= start) {
+          const totalDuration = end - start;
+          const elapsed = now - start;
+          percentage = (elapsed / totalDuration) * 100;
+          
+          const diffMs = end - now;
+          const hrs = String(Math.floor(diffMs / 3600000)).padStart(2, '0');
+          const mins = String(Math.floor((diffMs % 3600000) / 60000)).padStart(2, '0');
+          const secs = String(Math.floor((diffMs % 60000) / 1000)).padStart(2, '0');
+          countdownText = `T-MINUS: ${hrs}:${mins}:${secs}`;
+        } else {
+          countdownText = "AWAITING_SHIFT_START";
+        }
+        
+        document.getElementById('time-left').innerText = countdownText;
+        const cleanPct = percentage.toFixed(2);
+        document.getElementById('progress-bar').style.width = `${cleanPct}%`;
+        document.getElementById('progress-text').innerText = `${cleanPct}%`;
+      },
+
+      async fetchWeather() {
+        try {
+          const url = `https://api.open-meteo.com/v1/forecast?latitude=${this.config.lat}&longitude=${this.config.lon}&current=temperature_2m,relative_humidity_2m,weather_code`;
+          const response = await fetch(url);
+          if (!response.ok) throw new Error("API Offline");
+          
+          const data = await response.json();
+          const temp = Math.round(data.current.temperature_2m);
+          
+          const codeMap = {
+            0: "RAD-STORM CLEARED", 1: "MAINLY CLEAR", 2: "PARTLY CLOUDY", 3: "OVERCAST (WATCH FOR DROP PODS)",
+            45: "SILENT HILL FOG", 51: "ACID DRIZZLE", 61: "SLIGHT RAIN", 63: "HEAVY RAIN"
+          };
+          const condition = codeMap[data.current.weather_code] || "MATRIX ACTIVE";
+          
+          document.getElementById('weather').innerHTML = `
+            <div style="font-size: 1.8rem; color: #00ffcc; font-weight: bold; text-shadow: 0 0 8px #00ffcc;">${temp}°C // ${condition}</div>
+            <div style="font-size: 0.8rem; color: rgba(0, 255, 204, 0.6); margin-top: 4px;">RELATIVE HUMIDITY: ${data.current.relative_humidity_2m}%</div>
+          `;
+        } catch (error) {
+          document.getElementById('weather').innerHTML = `<span style="color: #ff0055;" class="glitch">WEATHER_SENSORS_COMPROMISED</span>`;
+        }
+      },
+
+      async loadDictionary() {
+        try {
+          const res = await fetch('madlibs.json');
+          if (res.ok) this.dictionary = await res.json();
+        } catch (e) {
+          console.warn("Could not load madlibs.json, using defaults.");
+        }
+      },
+
+      generateCorruptedLog() {
+        const s = this.dictionary.subjects[Math.floor(Math.random() * this.dictionary.subjects.length)];
+        const v = this.dictionary.verbs[Math.floor(Math.random() * this.dictionary.verbs.length)];
+        const o = this.dictionary.objects[Math.floor(Math.random() * this.dictionary.objects.length)];
+
+        const sentence = `${s} ${v} ${o}`;
+        const hexId = Math.floor(Math.random()*16777215).toString(16).toUpperCase().padStart(6, '0');
+
+        document.getElementById('madlib-board').innerHTML = `
+          <div style="font-size: 0.8rem; color: #ff0055; margin-bottom: 8px;">> INTERCEPT_ID: 0x${hexId}</div>
+          <div style="font-size: 1.15rem; color: #00ffcc; line-height: 1.5; text-shadow: 0 0 5px rgba(0,255,204,0.3);">
+            > "${sentence}"
+          </div>
+        `;
+      }
+    };
+
+    // Ignite the engine
+    CyberDash.init();
+  </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CYBER_DASH // v2.077_PHANTOM</title>
   <style>
