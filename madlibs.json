@@ -1,0 +1,38 @@
+{
+  "subjects": [
+    "A rogue Dogtown netrunner",
+    "The Umbrella Corp IT department",
+    "A feral ghoul",
+    "Mr. X",
+    "A malfunctioning Ender 3 direct drive",
+    "The local sysadmin",
+    "A Splicer from Rapture",
+    "An unpatched Azure AD tenant",
+    "A highly aggressive Deathclaw",
+    "The Tojo Clan chairman"
+  ],
+  "verbs": [
+    "spilled Mango Loco over",
+    "closed a Freshdesk ticket by burning",
+    "attempted to overwrite the Relic with",
+    "critically overclocked",
+    "injected a plasmid into",
+    "blamed a DNS outage on",
+    "bypassed the Watchguard firewall using",
+    "accidentally 3D printed",
+    "spilled a fresh pot of Nuln Oil on",
+    "ran a rogue SnipeIT script against"
+  ],
+  "objects": [
+    "a spilled can of sugar-free Mountain Dew.",
+    "the company's primary domain controller.",
+    "the Spencer Mansion blueprints.",
+    "a glowing bottle of Nuka-Cola Quantum.",
+    "the Blackwall.",
+    "a user who unplugged their own monitor.",
+    "a heavily modified PrusaSlicer config.",
+    "the Master Sword.",
+    "a pristine PLA diorama.",
+    "the Print Spooler service."
+  ]
+}
