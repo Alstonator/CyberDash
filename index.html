@@ -90,14 +90,17 @@
       transform: translate(-50%, -50%);
       z-index: 110;
       text-align: center;
+      width: 90%;
+      max-width: 500px;
       opacity: 0;
       animation: stamp-in 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.3s forwards;
     }
 
     .boot-logo {
-      max-width: 180px;
+      width: 100%;
       height: auto;
-      filter: drop-shadow(0 0 15px rgba(255, 0, 85, 0.6));
+      /* Inverts black asset to white text, shifts tint to neon corporate hot pink */
+      filter: invert(1) sepia(1) saturate(5) hue-rotate(300deg) drop-shadow(0 0 20px #ff0055);
     }
 
     /* Animation States managed by JS */
@@ -113,8 +116,8 @@
 
     /* Keyframes */
     @keyframes stamp-in {
-      0% { transform: translate(-50%, -50%) scale(4); opacity: 0; filter: blur(10px); }
-      70% { transform: translate(-50%, -50%) scale(0.95); opacity: 1; filter: blur(0); }
+      0% { transform: translate(-50%, -50%) scale(4); opacity: 0; filter: invert(1) blur(10px); }
+      70% { transform: translate(-50%, -50%) scale(0.95); opacity: 1; filter: invert(1) sepia(1) saturate(5) hue-rotate(300deg) drop-shadow(0 0 30px #ff0055); }
       100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
     }
 
@@ -259,8 +262,8 @@
   <div id="boot-screen">
     <div class="shutter shutter-top"></div>
     <div class="boot-logo-container">
-      <img src="Alstonator Industries Logo.png" alt="CYBER_DASH LOGO" class="boot-logo" onerror="this.style.display='none'; document.getElementById('logo-fallback').style.display='block';">
-      <div id="logo-fallback" style="display:none; font-size: 3rem; font-weight: bold; color: #ff0055; text-shadow: 0 0 10px #ff0055;">[ PHANTOM ]</div>
+      <img src="Alstonator_Industries_Logo.png" alt="ALSTONATOR INDUSTRIES LOGO" class="boot-logo" onerror="this.style.display='none'; document.getElementById('logo-fallback').style.display='block';">
+      <div id="logo-fallback" style="display:none; font-size: 2rem; font-weight: bold; color: #ff0055; text-shadow: 0 0 10px #ff0055;">[ ALSTONATOR INDUSTRIES ]</div>
     </div>
     <div class="shutter shutter-bottom"></div>
   </div>
@@ -354,143 +357,10 @@
       runBootSequence() {
         const bootScreen = document.getElementById('boot-screen');
         
-        // 1. Shutter impact / Screen shake occurs exactly when the logo stamp hits home
+        // Shutter impact / Screen shake handles the heavy slam timing
         setTimeout(() => {
           document.body.classList.add('shaking');
-          // Clear shake class after animation finishes
           setTimeout(() => document.body.classList.remove('shaking'), 300);
         }, 800);
 
-        // 2. Trigger the mechanical shutter door opening mechanism
-        setTimeout(() => {
-          bootScreen.classList.add('open');
-          // Fully drop the element out of layout after transitioning out
-          setTimeout(() => bootScreen.style.display = 'none', 900);
-        }, 1600);
-      },
-
-      loadConfig() {
-        const saved = localStorage.getItem('cyberDashConfig');
-        if (saved) {
-          this.config = { ...this.config, ...JSON.parse(saved) };
-        }
-      },
-
-      saveConfig() {
-        this.config.shiftStart = document.getElementById('shiftStart').value || "07:30";
-        this.config.shiftEnd = document.getElementById('shiftEnd').value || "16:00";
-        localStorage.setItem('cyberDashConfig', JSON.stringify(this.config));
-        this.toggleModal(false);
-        this.updateChronometer();
-      },
-
-      bindEvents() {
-        document.getElementById('btn-open-config').addEventListener('click', () => this.toggleModal(true));
-        document.getElementById('btn-cancel-config').addEventListener('click', () => this.toggleModal(false));
-        document.getElementById('btn-save-config').addEventListener('click', () => this.saveConfig());
-      },
-
-      toggleModal(show) {
-        const modal = document.getElementById('settingsModal');
-        if (show) {
-          document.getElementById('shiftStart').value = this.config.shiftStart;
-          document.getElementById('shiftEnd').value = this.config.shiftEnd;
-          modal.style.display = 'flex';
-        } else {
-          modal.style.display = 'none';
-        }
-      },
-
-      updateChronometer() {
-        const now = new Date();
-        document.getElementById('clock').innerText = now.toTimeString().split(' ')[0];
-        
-        const start = new Date();
-        const [startH, startM] = this.config.shiftStart.split(':');
-        start.setHours(parseInt(startH), parseInt(startM), 0, 0);
-        
-        const end = new Date();
-        const [endH, endM] = this.config.shiftEnd.split(':');
-        end.setHours(parseInt(endH), parseInt(endM), 0, 0);
-        
-        let percentage = 0;
-        let countdownText = "";
-        
-        if (now > end) {
-          percentage = 100;
-          countdownText = "SYS_CLEAR // ESCAPE_SUCCESS";
-        } else if (now >= start) {
-          const totalDuration = end - start;
-          const elapsed = now - start;
-          percentage = (elapsed / totalDuration) * 100;
-          
-          const diffMs = end - now;
-          const hrs = String(Math.floor(diffMs / 3600000)).padStart(2, '0');
-          const mins = String(Math.floor((diffMs % 3600000) / 60000)).padStart(2, '0');
-          const secs = String(Math.floor((diffMs % 60000) / 1000)).padStart(2, '0');
-          countdownText = `T-MINUS: ${hrs}:${mins}:${secs}`;
-        } else {
-          countdownText = "AWAITING_SHIFT_START";
-        }
-        
-        document.getElementById('time-left').innerText = countdownText;
-        const cleanPct = percentage.toFixed(2);
-        document.getElementById('progress-bar').style.width = `${cleanPct}%`;
-        document.getElementById('progress-text').innerText = `${cleanPct}%`;
-      },
-
-      async fetchWeather() {
-        try {
-          const url = `https://api.open-meteo.com/v1/forecast?latitude=${this.config.lat}&longitude=${this.config.lon}&current=temperature_2m,relative_humidity_2m,weather_code`;
-          const response = await fetch(url);
-          if (!response.ok) throw new Error("API Offline");
-          
-          const data = await response.json();
-          const temp = Math.round(data.current.temperature_2m);
-          
-          const codeMap = {
-            0: "RAD-STORM CLEARED", 1: "MAINLY CLEAR", 2: "PARTLY CLOUDY", 3: "OVERCAST (WATCH FOR DROP PODS)",
-            45: "SILENT HILL FOG", 51: "ACID DRIZZLE", 61: "SLIGHT RAIN", 63: "HEAVY RAIN"
-          };
-          const condition = codeMap[data.current.weather_code] || "MATRIX ACTIVE";
-          
-          document.getElementById('weather').innerHTML = `
-            <div style="font-size: 1.8rem; color: #00ffcc; font-weight: bold; text-shadow: 0 0 8px #00ffcc;">${temp}°C // ${condition}</div>
-            <div style="font-size: 0.8rem; color: rgba(0, 255, 204, 0.6); margin-top: 4px;">RELATIVE HUMIDITY: ${data.current.relative_humidity_2m}%</div>
-          `;
-        } catch (error) {
-          document.getElementById('weather').innerHTML = `<span style="color: #ff0055;" class="glitch">WEATHER_SENSORS_COMPROMISED</span>`;
-        }
-      },
-
-      async loadDictionary() {
-        try {
-          const res = await fetch('madlibs.json');
-          if (res.ok) this.dictionary = await res.json();
-        } catch (e) {
-          console.warn("Could not load madlibs.json, using defaults.");
-        }
-      },
-
-      generateCorruptedLog() {
-        const s = this.dictionary.subjects[Math.floor(Math.random() * this.dictionary.subjects.length)];
-        const v = this.dictionary.verbs[Math.floor(Math.random() * this.dictionary.verbs.length)];
-        const o = this.dictionary.objects[Math.floor(Math.random() * this.dictionary.objects.length)];
-
-        const sentence = `${s} ${v} ${o}`;
-        const hexId = Math.floor(Math.random()*16777215).toString(16).toUpperCase().padStart(6, '0');
-
-        document.getElementById('madlib-board').innerHTML = `
-          <div style="font-size: 0.8rem; color: #ff0055; margin-bottom: 8px;">> INTERCEPT_ID: 0x${hexId}</div>
-          <div style="font-size: 1.15rem; color: #00ffcc; line-height: 1.5; text-shadow: 0 0 5px rgba(0,255,204,0.3);">
-            > "${sentence}"
-          </div>
-        `;
-      }
-    };
-
-    // Ignite the engine
-    CyberDash.init();
-  </script>
-</body>
-</html>
+        // Splitting shutters
