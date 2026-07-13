@@ -153,7 +153,7 @@
     .matrix-grid {
       display: grid;
       grid-template-columns: 1fr;
-      grid-gap: 15px;
+      grid-gap: 12px;
       height: calc(100% - 40px);
       z-index: 1;
       position: relative;
@@ -163,7 +163,7 @@
       border: 1px solid #00ffcc;
       background: rgba(11, 12, 16, 0.85);
       box-shadow: 0 0 12px rgba(0, 255, 204, 0.15), inset 0 0 10px rgba(0, 255, 204, 0.1);
-      padding: 15px;
+      padding: 12px;
       position: relative;
     }
 
@@ -179,7 +179,7 @@
       font-size: 0.85rem;
       letter-spacing: 2px;
       color: #ff0055;
-      margin-bottom: 12px;
+      margin-bottom: 8px;
       border-bottom: 1px solid #ff0055;
       padding-bottom: 4px;
       text-transform: uppercase;
@@ -240,17 +240,19 @@
       width: 90%;
       max-width: 400px;
       position: relative;
+      max-height: 90vh;
+      overflow-y: auto;
     }
 
-    .modal-content label { display: block; margin-top: 15px; color: #00ffcc; font-size: 0.9rem; }
+    .modal-content label { display: block; margin-top: 12px; color: #00ffcc; font-size: 0.85rem; letter-spacing: 1px; }
     .modal-content input {
-      width: 100%; padding: 10px; margin-top: 5px;
+      width: 100%; padding: 8px; margin-top: 4px;
       background: rgba(0, 255, 204, 0.05); border: 1px solid #ff0055; color: #fff;
-      font-family: 'Share Tech Mono', monospace; font-size: 1.1rem;
+      font-family: 'Share Tech Mono', monospace; font-size: 1rem;
     }
     .modal-content input:focus { outline: none; box-shadow: 0 0 8px rgba(255, 0, 85, 0.5); }
     
-    .modal-buttons { margin-top: 25px; display: flex; justify-content: flex-end; gap: 15px; }
+    .modal-buttons { margin-top: 20px; display: flex; justify-content: flex-end; gap: 15px; }
   </style>
 </head>
 <body>
@@ -287,6 +289,11 @@
     </section>
 
     <section class="cyber-panel">
+      <div class="panel-header" id="target-header">TIMELINE // TRACKING</div>
+      <div id="target-countdown" style="font-size: 1.8rem; color: #00ffcc; font-weight: bold; text-shadow: 0 0 8px #00ffcc; letter-spacing: 1px;">00d // 00h // 00m // 00s</div>
+    </section>
+
+    <section class="cyber-panel">
       <div class="panel-header">ENV_METRICS (OUTSIDE THE WALLS)</div>
       <div id="weather">CONNECTING TO SENSORS...</div>
     </section>
@@ -301,13 +308,25 @@
 
   <div class="modal-overlay" id="settingsModal">
     <div class="modal-content">
-      <div class="panel-header" style="font-size: 1.2rem;">OVERRIDE SHIFT PARAMETERS</div>
+      <div class="panel-header" style="font-size: 1.2rem;">OVERRIDE CONTROL PARAMETERS</div>
       
-      <label for="shiftStart">SHIFT START (HH:MM)</label>
-      <input type="time" id="shiftStart" required>
-      
-      <label for="shiftEnd">SHIFT END (HH:MM)</label>
-      <input type="time" id="shiftEnd" required>
+      <div style="border-bottom: 1px dashed rgba(255,0,85,0.25); padding-bottom: 12px; margin-bottom: 12px;">
+        <label for="shiftStart">SHIFT START (HH:MM)</label>
+        <input type="time" id="shiftStart" required>
+        
+        <label for="shiftEnd">SHIFT END (HH:MM)</label>
+        <input type="time" id="shiftEnd" required>
+      </div>
+
+      <div>
+        <div class="panel-header" style="font-size: 0.85rem; color: #00ffcc; border-color: #00ffcc; margin-bottom: 8px;">CHRONO_TARGET_CONFIG</div>
+        
+        <label for="targetLabel">EVENT TRACK IDENTIFIER</label>
+        <input type="text" id="targetLabel" placeholder="e.g., JAPAN_DEPARTURE" required>
+        
+        <label for="targetDate">TARGET TIMELINE MATRIX</label>
+        <input type="datetime-local" id="targetDate" required>
+      </div>
       
       <div class="modal-buttons">
         <button class="config-btn" id="btn-cancel-config" style="border-color: #555; color: #aaa;">CANCEL</button>
@@ -324,7 +343,9 @@
         lat: 52.4555,
         lon: -1.7289,
         shiftStart: "07:30",
-        shiftEnd: "16:00"
+        shiftEnd: "16:00",
+        targetLabel: "JAPAN_DEPARTURE",
+        targetDate: "2027-04-01T08:00"
       },
       
       dictionary: {
@@ -338,9 +359,13 @@
         this.bindEvents();
         this.runBootSequence();
         
-        // Boot sequences
+        // Chronometer sequences
         this.updateChronometer();
-        setInterval(() => this.updateChronometer(), 1000);
+        this.updateTargetCountdown();
+        setInterval(() => {
+          this.updateChronometer();
+          this.updateTargetCountdown();
+        }, 1000);
         
         this.fetchWeather();
         setInterval(() => this.fetchWeather(), 900000); // 15 mins
@@ -380,9 +405,13 @@
       saveConfig() {
         this.config.shiftStart = document.getElementById('shiftStart').value || "07:30";
         this.config.shiftEnd = document.getElementById('shiftEnd').value || "16:00";
+        this.config.targetLabel = document.getElementById('targetLabel').value || "TRACKING";
+        this.config.targetDate = document.getElementById('targetDate').value || "2027-04-01T08:00";
+
         localStorage.setItem('cyberDashConfig', JSON.stringify(this.config));
         this.toggleModal(false);
         this.updateChronometer();
+        this.updateTargetCountdown();
       },
 
       bindEvents() {
@@ -396,6 +425,8 @@
         if (show) {
           document.getElementById('shiftStart').value = this.config.shiftStart;
           document.getElementById('shiftEnd').value = this.config.shiftEnd;
+          document.getElementById('targetLabel').value = this.config.targetLabel;
+          document.getElementById('targetDate').value = this.config.targetDate;
           modal.style.display = 'flex';
         } else {
           modal.style.display = 'none';
@@ -438,6 +469,34 @@
         const cleanPct = percentage.toFixed(2);
         document.getElementById('progress-bar').style.width = `${cleanPct}%`;
         document.getElementById('progress-text').innerText = `${cleanPct}%`;
+      },
+
+      updateTargetCountdown() {
+        const targetHeader = document.getElementById('target-header');
+        const targetDisplay = document.getElementById('target-countdown');
+        
+        targetHeader.innerText = `TIMELINE // ${this.config.targetLabel.toUpperCase()}`;
+        
+        const now = new Date().getTime();
+        const target = new Date(this.config.targetDate).getTime();
+        const diff = target - now;
+        
+        if (isNaN(target) || diff <= 0) {
+          targetDisplay.innerHTML = `<span style="color: #ff0055;" class="glitch">TARGET_TIMELINE_REACHED</span>`;
+          return;
+        }
+        
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+        
+        const dStr = String(days).padStart(2, '0');
+        const hStr = String(hours).padStart(2, '0');
+        const mStr = String(minutes).padStart(2, '0');
+        const sStr = String(seconds).padStart(2, '0');
+        
+        targetDisplay.innerText = `${dStr}d // ${hStr}h // ${mStr}m // ${sStr}s`;
       },
 
       async fetchWeather() {
